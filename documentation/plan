@@ -6,7 +6,7 @@
    - [x] Set up HTML, CSS, and JavaScript files
    - [x] Create basic folder structure (assets, scripts, styles)
    - [x] Create start menue with just start new game
-   - [ ] Initialize Git repository
+   - [x] Initialize Git repository
 
 2. **Core Game State Design**
    - [ ] Design the game state object structure
