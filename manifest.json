@@ -1,0 +1,17 @@
+{
+  "name": "Dino Tamagotchi",
+  "short_name": "DinoTama",
+  "description": "Take care of your own virtual dinosaur pet!",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#222831",
+  "theme_color": "#222831",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "assets/egg_green.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+} 
