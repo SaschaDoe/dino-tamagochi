@@ -36,7 +36,8 @@ document.addEventListener('DOMContentLoaded', () => {
         lastIdleTime: null,
         isWobbling: false,
         isJumping: false,
-        wobbleInterval: null
+        wobbleInterval: null,
+        clicksNeeded: 0
     };
     
     // Check if there's a saved game
@@ -89,7 +90,8 @@ document.addEventListener('DOMContentLoaded', () => {
             lastIdleTime: Date.now(),
             isWobbling: false,
             isJumping: false,
-            wobbleInterval: null
+            wobbleInterval: null,
+            clicksNeeded: 0
         };
         
         updateUI();
@@ -172,6 +174,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (gameState.wobbleInterval) {
                 clearInterval(gameState.wobbleInterval);
             }
+            
+            // Remove any existing click event listener
+            dinoImage.removeEventListener('click', handleDinoClick);
             
             gameState = savedGame;
             
@@ -415,38 +420,87 @@ document.addEventListener('DOMContentLoaded', () => {
             clearTimeout(gameState.actionTimeout);
         }
         
-        // Set timeout to end action
-        gameState.actionTimeout = setTimeout(() => {
-            gameState.currentAction = null;
+        // For sleeping action, use timer as before
+        if (action === 'sleeping') {
+            // Set timeout to end action
+            gameState.actionTimeout = setTimeout(() => {
+                completeAction(statToIncrease, amount);
+            }, duration);
+        } else {
+            // For other actions, require 3 clicks on the dino
+            gameState.clicksNeeded = 3;
+            statusMessage.textContent = `${getActionMessage(action)} Click the dino ${gameState.clicksNeeded} times!`;
             
-            // Store previous value to detect change
-            const prevValue = gameState[statToIncrease];
-            
-            // Update stat
-            gameState[statToIncrease] = Math.min(100, gameState[statToIncrease] + amount);
-            
-            // Update UI
-            updateUI();
-            
-            // Add blinking effect for increased stat
-            if (gameState[statToIncrease] > prevValue) {
-                let statBar;
-                switch(statToIncrease) {
-                    case 'hunger': statBar = hungerBar; break;
-                    case 'happiness': statBar = happinessBar; break;
-                    case 'cleanliness': statBar = cleanlinessBar; break;
-                    case 'energy': statBar = energyBar; break;
-                }
-                if (statBar) {
-                    blinkStat(statBar, 'increase');
-                }
+            // Add click event listener for the dino
+            dinoImage.addEventListener('click', handleDinoClick);
+        }
+    }
+    
+    // Handle dino clicks during actions
+    function handleDinoClick() {
+        if (!gameState.currentAction || gameState.currentAction === 'sleeping') return;
+        
+        gameState.clicksNeeded--;
+        
+        if (gameState.clicksNeeded <= 0) {
+            // Action complete
+            dinoImage.removeEventListener('click', handleDinoClick);
+            completeAction(getStatForAction(gameState.currentAction), getAmountForAction(gameState.currentAction));
+        } else {
+            // Update status message with remaining clicks
+            statusMessage.textContent = `${getActionMessage(gameState.currentAction)} Click the dino ${gameState.clicksNeeded} more times!`;
+        }
+    }
+    
+    // Helper function to get the stat for an action
+    function getStatForAction(action) {
+        switch(action) {
+            case 'eating': return 'hunger';
+            case 'playing': return 'happiness';
+            case 'washing': return 'cleanliness';
+            case 'sleeping': return 'energy';
+            default: return '';
+        }
+    }
+    
+    // Helper function to get the amount for an action
+    function getAmountForAction(action) {
+        // You can customize these amounts if needed
+        return 30;
+    }
+    
+    // Complete an action and update stats
+    function completeAction(statToIncrease, amount) {
+        // Store previous value to detect change
+        const prevValue = gameState[statToIncrease];
+        
+        // Update stat
+        gameState[statToIncrease] = Math.min(100, gameState[statToIncrease] + amount);
+        
+        // Reset current action
+        gameState.currentAction = null;
+        
+        // Update UI
+        updateUI();
+        
+        // Add blinking effect for increased stat
+        if (gameState[statToIncrease] > prevValue) {
+            let statBar;
+            switch(statToIncrease) {
+                case 'hunger': statBar = hungerBar; break;
+                case 'happiness': statBar = happinessBar; break;
+                case 'cleanliness': statBar = cleanlinessBar; break;
+                case 'energy': statBar = energyBar; break;
             }
-            
-            // Reset idle timer after action
-            gameState.lastIdleTime = Date.now();
-            
-            saveGame();
-        }, duration);
+            if (statBar) {
+                blinkStat(statBar, 'increase');
+            }
+        }
+        
+        // Reset idle timer after action
+        gameState.lastIdleTime = Date.now();
+        
+        saveGame();
     }
     
     // Get message for current action
