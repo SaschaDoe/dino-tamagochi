@@ -32,7 +32,11 @@ document.addEventListener('DOMContentLoaded', () => {
         actionTimeout: null,
         gameStartTime: null,
         lastUpdateTime: null,
-        updateInterval: 5000 // 5 seconds in milliseconds
+        updateInterval: 5000, // 5 seconds in milliseconds
+        lastIdleTime: null,
+        isWobbling: false,
+        isJumping: false,
+        wobbleInterval: null
     };
     
     // Check if there's a saved game
@@ -72,20 +76,27 @@ document.addEventListener('DOMContentLoaded', () => {
     function initGame() {
         gameState = {
             stage: 'egg',
-            hunger: 100,
-            happiness: 100,
-            cleanliness: 100,
-            energy: 100,
+            hunger: 50,
+            happiness: 50,
+            cleanliness: 50,
+            energy: 50,
             lastSaved: Date.now(),
             currentAction: null,
             actionTimeout: null,
             gameStartTime: Date.now(),
             lastUpdateTime: Date.now(),
-            updateInterval: 5000
+            updateInterval: 5000,
+            lastIdleTime: Date.now(),
+            isWobbling: false,
+            isJumping: false,
+            wobbleInterval: null
         };
         
         updateUI();
         startGameLoop();
+        
+        // Start egg wobbling animation
+        startEggWobbling();
         
         // Start hatching sequence after 5 seconds
         setTimeout(() => {
@@ -93,17 +104,87 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 5000);
     }
     
+    // Start egg wobbling animation
+    function startEggWobbling() {
+        if (gameState.stage !== 'egg') return;
+        
+        // Initial wobble to ensure it starts immediately
+        setTimeout(() => {
+            if (gameState.stage === 'egg' && !gameState.isWobbling) {
+                gameState.isWobbling = true;
+                dinoImage.classList.add('wobble');
+                
+                // Stop wobbling after a short duration (0.5-1 seconds)
+                setTimeout(() => {
+                    stopEggWobbling();
+                }, 500 + Math.random() * 500);
+            }
+        }, 1000);
+        
+        // Set up periodic wobbling
+        const wobbleInterval = setInterval(() => {
+            // Only wobble if not already wobbling and in egg stage
+            if (!gameState.isWobbling && gameState.stage === 'egg') {
+                // Start wobbling
+                gameState.isWobbling = true;
+                dinoImage.classList.add('wobble');
+                
+                // Stop wobbling after a short duration (0.5-1 seconds)
+                setTimeout(() => {
+                    stopEggWobbling();
+                }, 500 + Math.random() * 500);
+            }
+        }, 3000 + Math.random() * 2000); // Wobble every 3-5 seconds
+        
+        // Store the interval ID in the game state for cleanup
+        gameState.wobbleInterval = wobbleInterval;
+    }
+    
+    // Stop egg wobbling animation
+    function stopEggWobbling() {
+        gameState.isWobbling = false;
+        dinoImage.classList.remove('wobble');
+        dinoImage.style.animation = '';
+    }
+    
+    // Make dino jump (idle animation)
+    function makeJump() {
+        if (gameState.stage !== 'baby' || gameState.currentAction || gameState.isJumping) return;
+        
+        gameState.isJumping = true;
+        
+        // Add jump animation
+        dinoImage.classList.add('jump');
+        
+        // Reset after animation completes
+        setTimeout(() => {
+            dinoImage.classList.remove('jump');
+            gameState.isJumping = false;
+        }, 800);
+    }
+    
     // Load a saved game
     function loadGame() {
         const savedGame = JSON.parse(localStorage.getItem('dinoTamagotchiSave'));
         
         if (savedGame) {
+            // Clear any existing wobble interval
+            if (gameState.wobbleInterval) {
+                clearInterval(gameState.wobbleInterval);
+            }
+            
             gameState = savedGame;
+            
+            // Ensure wobble interval is null (it can't be serialized)
+            gameState.wobbleInterval = null;
+            gameState.isWobbling = false;
+            gameState.isJumping = false;
             
             // Calculate stat decay since last save
             const timePassed = (Date.now() - gameState.lastSaved) / 1000; // in seconds
             const decayAmount = Math.min(timePassed / 60, 100); // Max 100% decay
             
+            // Ensure stats don't go below 0
             gameState.hunger = Math.max(0, gameState.hunger - decayAmount);
             gameState.happiness = Math.max(0, gameState.happiness - decayAmount);
             gameState.cleanliness = Math.max(0, gameState.cleanliness - decayAmount);
@@ -112,16 +193,32 @@ document.addEventListener('DOMContentLoaded', () => {
             // Update time-related state
             gameState.gameStartTime = Date.now() - (timePassed * 1000);
             gameState.lastUpdateTime = Date.now();
+            gameState.lastIdleTime = Date.now();
+            gameState.isWobbling = false;
+            gameState.isJumping = false;
             
             updateUI();
             startGameLoop();
+            
+            // If in egg stage, start wobbling
+            if (gameState.stage === 'egg') {
+                startEggWobbling();
+            }
+        } else {
+            // If no saved game or error loading, start a new game
+            initGame();
         }
     }
     
     // Save the game
     function saveGame() {
         gameState.lastSaved = Date.now();
-        localStorage.setItem('dinoTamagotchiSave', JSON.stringify(gameState));
+        
+        // Create a copy of the game state without the interval
+        const gameStateCopy = { ...gameState };
+        delete gameStateCopy.wobbleInterval;
+        
+        localStorage.setItem('dinoTamagotchiSave', JSON.stringify(gameStateCopy));
     }
     
     // Update progress bar
@@ -136,6 +233,20 @@ document.addEventListener('DOMContentLoaded', () => {
         intervalProgress.style.width = `${progressPercentage}%`;
     }
     
+    // Check for idle animations
+    function checkIdleAnimations() {
+        if (gameState.stage === 'baby' && !gameState.currentAction && !gameState.isJumping) {
+            const currentTime = Date.now();
+            const idleTime = currentTime - gameState.lastIdleTime;
+            
+            // Random jump every 10-20 seconds of idle time
+            if (idleTime > 10000 + Math.random() * 10000) {
+                makeJump();
+                gameState.lastIdleTime = currentTime;
+            }
+        }
+    }
+    
     // Start the game loop
     function startGameLoop() {
         // Save game every minute
@@ -143,6 +254,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Update progress bar every 100ms for smooth animation
         setInterval(updateProgressBar, 100);
+        
+        // Check for idle animations every second
+        setInterval(checkIdleAnimations, 1000);
         
         // Decay stats over time
         setInterval(() => {
@@ -186,8 +300,15 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Add blinking effect to a stat bar
     function blinkStat(statBar, changeType) {
-        // Save original color
-        const originalColor = window.getComputedStyle(statBar).backgroundColor;
+        // Store the original color based on the stat bar ID
+        let originalColor;
+        switch(statBar.id) {
+            case 'hunger-bar': originalColor = '#e74c3c'; break;
+            case 'happiness-bar': originalColor = '#f1c40f'; break;
+            case 'cleanliness-bar': originalColor = '#3498db'; break;
+            case 'energy-bar': originalColor = '#2ecc71'; break;
+            default: originalColor = '#5d4f6f';
+        }
         
         // Set color based on change type
         if (changeType === 'decrease') {
@@ -205,6 +326,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Hatch the egg
     function hatchEgg() {
         if (gameState.stage === 'egg') {
+            // Stop wobbling animation and clear interval
+            stopEggWobbling();
+            if (gameState.wobbleInterval) {
+                clearInterval(gameState.wobbleInterval);
+                gameState.wobbleInterval = null;
+            }
+            
             gameState.stage = 'hatching';
             dinoImage.src = 'assets/dino_trex_green_hatching.png';
             statusMessage.textContent = 'Your egg is hatching!';
@@ -214,6 +342,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 gameState.stage = 'baby';
                 dinoImage.src = 'assets/dino_trex_level1.png';
                 statusMessage.textContent = 'Your dino has hatched!';
+                gameState.lastIdleTime = Date.now();
             }, 3000);
         }
     }
@@ -245,10 +374,21 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (gameState.energy < 30) {
             dinoImage.src = 'assets/dino_trex_green_sleeping.png';
             statusMessage.textContent = 'Your dino is tired!';
+        } else if (isHappy()) {
+            dinoImage.src = 'assets/dino_trex_green_happy.png';
+            statusMessage.textContent = 'Your dino is happy!';
         } else {
             dinoImage.src = 'assets/dino_trex_level1.png';
             statusMessage.textContent = '';
         }
+    }
+    
+    // Check if dino is happy (all stats 80% or higher)
+    function isHappy() {
+        return gameState.hunger >= 80 && 
+               gameState.happiness >= 80 && 
+               gameState.cleanliness >= 80 && 
+               gameState.energy >= 80;
     }
     
     // Check dino status and update UI accordingly
@@ -301,6 +441,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     blinkStat(statBar, 'increase');
                 }
             }
+            
+            // Reset idle timer after action
+            gameState.lastIdleTime = Date.now();
             
             saveGame();
         }, duration);

@@ -19,7 +19,7 @@ body {
 
 .container {
     width: 100%;
-    max-width: 800px;
+    max-width: 1000px;
     padding: 20px;
 }
 
@@ -36,15 +36,15 @@ body {
 }
 
 .game-window {
-    background-color: rgba(34, 40, 49, 0.85);
-    border-radius: 10px;
+    background-color: rgba(34, 40, 49, 0.909);
+    border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-    padding: 20px;
+    padding: 30px;
     text-align: center;
     border: 1px solid rgba(93, 79, 111, 0.3);
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 25px;
 }
 
 .fade-out {
@@ -121,15 +121,32 @@ button:active {
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 25px;
+    margin-bottom: 20px;
 }
 
 .stat {
     flex: 1;
-    min-width: 120px;
+    min-width: 160px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 12px;
+}
+
+.stat-icon {
+    width: 90px;
+    height: 90px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.stat-icon img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
 }
 
 .stat span {
@@ -139,7 +156,7 @@ button:active {
 
 .stat-bar {
     width: 100%;
-    height: 15px;
+    height: 20px;
     background-color: rgba(255, 255, 255, 0.2);
     border-radius: 10px;
     overflow: hidden;
@@ -172,8 +189,8 @@ button:active {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 300px;
-    margin: 20px 0;
+    height: 350px;
+    margin: 25px 0;
 }
 
 .dino-container img {
@@ -186,13 +203,24 @@ button:active {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 25px;
+    margin: 25px 0;
 }
 
 .control-button {
     flex: 1;
-    min-width: 100px;
-    max-width: 150px;
+    min-width: 120px;
+    max-width: 180px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.control-button img {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
 }
 
 .status-message {
@@ -241,4 +269,41 @@ button:active {
     background-color: #3498db;
     border-radius: 5px;
     transition: width 0.1s linear;
+}
+
+/* Animation keyframes */
+@keyframes wobble {
+    0% {
+        transform: rotate(-3deg);
+    }
+    50% {
+        transform: rotate(3deg);
+    }
+    100% {
+        transform: rotate(-3deg);
+    }
+}
+
+@keyframes jump {
+    0% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-50px);
+    }
+    60% {
+        transform: translateY(-50px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+.wobble {
+    transform-origin: bottom center;
+    animation: wobble 0.5s ease-in-out infinite;
+}
+
+.jump {
+    animation: jump 0.8s ease-in-out;
 } 
