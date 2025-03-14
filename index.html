@@ -3,15 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dino Maze</title>
+    <title>Dino Tamagotchi</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <div class="title-window">
-            <h1>Dino Maze</h1>
-            <p>Welcome to the adventure!</p>
-            <button id="start-button">Start Game</button>
+        <div class="title-window" id="start-screen">
+            <h1>Dino Tamagotchi</h1>
+            <p>Take care of your own dinosaur!</p>
+            <button id="start-button">Start New Game</button>
+            <button id="load-button" style="display: none;">Load Game</button>
+        </div>
+
+        <div id="game-screen" class="game-window" style="display: none;">
+            <div class="time-display">
+                <div class="time-progress-container">
+                    <div class="time-progress-bar">
+                        <div id="interval-progress" class="time-progress-fill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-bar">
+                <div class="stat">
+                    <span>Hunger:</span>
+                    <div class="stat-bar">
+                        <div id="hunger-bar" class="stat-fill"></div>
+                    </div>
+                </div>
+                <div class="stat">
+                    <span>Happiness:</span>
+                    <div class="stat-bar">
+                        <div id="happiness-bar" class="stat-fill"></div>
+                    </div>
+                </div>
+                <div class="stat">
+                    <span>Cleanliness:</span>
+                    <div class="stat-bar">
+                        <div id="cleanliness-bar" class="stat-fill"></div>
+                    </div>
+                </div>
+                <div class="stat">
+                    <span>Energy:</span>
+                    <div class="stat-bar">
+                        <div id="energy-bar" class="stat-fill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dino-container">
+                <img id="dino-image" src="assets/egg_green.png" alt="Dino">
+            </div>
+
+            <div class="controls">
+                <button id="feed-button" class="control-button">Feed</button>
+                <button id="play-button" class="control-button">Play</button>
+                <button id="clean-button" class="control-button">Clean</button>
+                <button id="sleep-button" class="control-button">Sleep</button>
+            </div>
+
+            <div class="status-message" id="status-message"></div>
         </div>
     </div>
     <script src="script.js"></script>
