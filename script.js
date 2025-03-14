@@ -40,12 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
         clicksNeeded: 0
     };
     
-    // Prevent default touch behaviors on game elements
-    document.querySelectorAll('.control-button, .dino-container, button').forEach(element => {
-        element.addEventListener('touchstart', (e) => {
-            e.preventDefault(); // Prevent default touch behavior like double-tap zoom
-        }, { passive: false });
-    });
+    // Fix for mobile touch events - don't prevent default behavior
+    // This allows normal touch interactions to work
     
     // Handle visibility change to pause/resume game
     document.addEventListener('visibilitychange', () => {
@@ -195,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Remove any existing click event listener
             dinoImage.removeEventListener('click', handleDinoClick);
-            dinoImage.removeEventListener('touchend', handleDinoClick);
+            dinoImage.removeEventListener('touchstart', handleDinoClick);
             
             gameState = savedGame;
             
@@ -232,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // If in the middle of an action that requires clicks, reattach event listeners
             if (gameState.currentAction && gameState.currentAction !== 'sleeping' && gameState.clicksNeeded > 0) {
                 dinoImage.addEventListener('click', handleDinoClick);
-                dinoImage.addEventListener('touchend', handleDinoClick);
+                dinoImage.addEventListener('touchstart', handleDinoClick);
             }
         } else {
             // If no saved game or error loading, start a new game
@@ -456,19 +452,15 @@ document.addEventListener('DOMContentLoaded', () => {
             gameState.clicksNeeded = 3;
             statusMessage.textContent = `${getActionMessage(action)} Tap the dino ${gameState.clicksNeeded} times!`;
             
-            // Add click/touch event listeners for the dino
+            // Add click event listener for the dino
             dinoImage.addEventListener('click', handleDinoClick);
-            dinoImage.addEventListener('touchend', handleDinoClick);
+            // Also add touchstart for mobile devices
+            dinoImage.addEventListener('touchstart', handleDinoClick);
         }
     }
     
     // Handle dino clicks/touches during actions
     function handleDinoClick(e) {
-        // Prevent default behavior for touch events
-        if (e.type === 'touchend') {
-            e.preventDefault();
-        }
-        
         if (!gameState.currentAction || gameState.currentAction === 'sleeping') return;
         
         gameState.clicksNeeded--;
@@ -476,7 +468,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (gameState.clicksNeeded <= 0) {
             // Action complete
             dinoImage.removeEventListener('click', handleDinoClick);
-            dinoImage.removeEventListener('touchend', handleDinoClick);
+            dinoImage.removeEventListener('touchstart', handleDinoClick);
             completeAction(getStatForAction(gameState.currentAction), getAmountForAction(gameState.currentAction));
         } else {
             // Update status message with remaining clicks
@@ -560,27 +552,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     sleepButton.addEventListener('click', () => {
-        performAction('sleeping', 'energy', 30, 5000);
-    });
-    
-    // Add touch event listeners for mobile
-    feedButton.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        performAction('eating', 'hunger', 30, 3000);
-    });
-    
-    playButton.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        performAction('playing', 'happiness', 30, 3000);
-    });
-    
-    cleanButton.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        performAction('washing', 'cleanliness', 30, 3000);
-    });
-    
-    sleepButton.addEventListener('touchend', (e) => {
-        e.preventDefault();
         performAction('sleeping', 'energy', 30, 5000);
     });
 }); 

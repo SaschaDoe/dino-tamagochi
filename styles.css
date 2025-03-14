@@ -193,6 +193,7 @@ button:active {
     height: 350px;
     margin: 25px 0;
     cursor: pointer; /* Makes it clear the dino is clickable */
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
 }
 
 .dino-container img {
@@ -219,6 +220,8 @@ button:active {
     justify-content: center;
     align-items: center;
     padding: 20px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
 }
 
 .control-button img {
@@ -227,6 +230,7 @@ button:active {
     object-fit: contain;
     user-select: none; /* Prevents text selection on image */
     -webkit-user-drag: none; /* Prevents dragging on iOS */
+    pointer-events: none; /* Ensures clicks go through to the button */
 }
 
 .status-message {
