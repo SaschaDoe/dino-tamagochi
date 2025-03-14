@@ -1,0 +1,129 @@
+# **Dino Tamagotchi Requirements Document**
+
+---
+
+## **1. Introduction**
+
+### 1.1 Purpose
+This document defines the requirements for a “Dino Tamagotchi” game, where players will nurture a dinosaur from an egg to a grown dino. It covers the main gameplay features, user interactions, and core systems needed to achieve a satisfying virtual pet experience.
+
+### 1.2 Scope
+- The project includes designing and implementing:
+  - An interactive egg-care system.
+  - Dino growth and development after hatching.
+  - Various care mechanics (feeding, cleaning, playing, health monitoring).
+  - Basic user interface for dino status tracking and action execution.
+
+- Out of scope:
+  - Advanced social features (e.g., online trading or battles with other dinos).
+  - Large-scale multiplayer functionality.
+
+---
+
+## **2. Gameplay Overview**
+
+### 2.1 Core Gameplay Loop
+1. **Acquire an Egg**:  
+   - The player starts by obtaining a **randomly generated dinosaur egg** with different possible colors and patterns (which will correspond to certain dino color traits after hatching).
+   - different types
+    - Tyrannosaurus Rex (T-Rex)
+    - Triceratops
+    - Velociraptor
+    - Brachiosaurus
+    - Stegosaurus
+    - Spinosaurus
+    - Ankylosaurus
+    - Pteranodon
+    - Pachycephalosaurus
+    - Parasaurolophus
+    - Diplodocus
+    - 
+
+2. **Hatching**:  
+   - After certain conditions are met (time, care level, etc.), the egg hatches into a baby dino.
+3. **Dino Care & Growth**:  
+   - The player must manage various dino stats (health, hunger, happiness, etc.) while it grows.
+
+---
+
+## **3. Functional Requirements**
+
+
+### 3.1 Dino Stage Requirements
+
+1. **Status Indicators (Post-Hatching)**  
+   - **Hunger**: Determines if the dino needs feeding.  
+   - **Thirst** (optional variation): Could separate feeding from hydration.  
+   - **Happiness**: Increases through play or attention.  
+   - **Cleanliness**: The dino may need cleaning or bathing to stay healthy.  
+   - **Energy**: Monitors how tired the dino is.  
+
+
+2. **Feeding System**  
+   - Allow players to select from different food items.  
+   - Each food affects the dino’s stats differently (e.g., some foods restore more hunger but less happiness).  
+   - Overfeeding or feeding harmful items lowers health or triggers negative effects.
+
+3. **Play/Interaction System**  
+   - **Toys or Mini-games**: Provide a method to increase happiness and bond with the dino.  
+   - **Social Interaction**: The dino reacts to user input (tapping on screen, petting animation, etc.).
+
+4. **Cleaning System**  
+   - The player can clean or bathe the dino to prevent sickness or decrease negative odors.  
+   - Dirty environment or ignoring cleanliness leads to lowered health.
+
+5. **Sleeping/Rest System**  
+   - The dino requires rest to replenish energy.  
+   - If ignored, low energy impacts health and happiness.
+
+6. **Growth & Evolution**  
+   - Over time and with proper care, the dino grows:  
+     - **Level/Stage Progression**: Child → Teen → Adult forms (optional expansions for advanced gameplay).  
+     - Each stage can unlock new abilities, items, or needs (e.g., bigger appetite, advanced toys).
+
+
+### 3.3 Additional Features
+
+1. **Customization**  
+   - Cosmetic changes (e.g., color of the dino, accessories).  
+   - Egg shell appearance variations (unlock or purchase with in-game currency).
+
+2. **Achievements/Rewards**  
+   - Achievements for milestones (first hatch, first evolution, X days of continuous care, etc.).  
+   - In-game currency or items as rewards.
+
+---
+
+## **4. User Interface Requirements**
+
+1. **Dino Interface**  
+   - Status bars or icons for hunger, happiness, cleanliness, energy.  
+   - Clear feedback or prompts (e.g., blinking icon if hunger is critical).
+
+2. **Interaction Buttons**  
+   - Accessible feed, clean, play, and sleep options.  
+   - Easy to navigate from egg stage to dino stage without confusion.
+
+3. **Minimal User Flow**  
+   - The interface should be intuitive for quick check-ins (e.g., a typical “Tamagotchi” style approach).
+
+---
+
+## **5. Technical Requirements**
+
+1. **Platform**  
+   - pc browser: Html, css, javascript 
+
+3. **Data Persistence**  
+   - Save the current status (egg/dino health, stats, progress) so players can resume seamlessly in local browser
+
+
+## **6. Non-Functional Requirements**
+
+
+
+## **7. Testing & Validation**
+
+1. **Functional Testing**  
+   - Verify each feature works as specified (egg warmth changes, dino feeding logic, growth progression).
+
