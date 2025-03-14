@@ -194,6 +194,7 @@ button:active {
     margin: 25px 0;
     cursor: pointer; /* Makes it clear the dino is clickable */
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+    position: relative; /* For positioning the hand cursor */
 }
 
 .dino-container img {
@@ -309,6 +310,14 @@ button:active {
     }
 }
 
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
+}
+
 .wobble {
     transform-origin: bottom center;
     animation: wobble 0.5s ease-in-out infinite;
@@ -316,6 +325,10 @@ button:active {
 
 .jump {
     animation: jump 0.8s ease-in-out;
+}
+
+.shake {
+    animation: shake 0.3s ease-in-out;
 }
 
 /* Media Queries for Responsive Design */
@@ -375,6 +388,11 @@ button:active {
     
     .status-message {
         font-size: 1rem;
+    }
+    
+    .hand-cursor {
+        width: 50px;
+        height: 50px;
     }
 }
 
@@ -463,6 +481,11 @@ button:active {
     .time-progress-bar {
         height: 6px;
     }
+    
+    .hand-cursor {
+        width: 40px;
+        height: 40px;
+    }
 }
 
 /* Extra small devices */
@@ -508,5 +531,50 @@ button:active {
     
     .status-message {
         font-size: 0.7rem;
+    }
+    
+    .hand-cursor {
+        width: 30px;
+        height: 30px;
+    }
+}
+
+/* Hand click animation */
+.hand-cursor {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background-image: url('assets/hand.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0;
+    transform: translate(-50%, -50%);
+    animation: clickAnimation 1.5s ease-in-out;
+}
+
+@keyframes clickAnimation {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+    20% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    40% {
+        transform: translate(-50%, -50%) scale(0.9);
+    }
+    60% {
+        transform: translate(-50%, -50%) scale(1);
+    }
+    80% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.9);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
     }
 } 

@@ -434,7 +434,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Update UI to show action
         dinoImage.src = `assets/dino_trex_green_${action}.png`;
-        statusMessage.textContent = getActionMessage(action);
+        
+        // Clear status message (removing text instructions)
+        statusMessage.textContent = '';
         
         // Clear any existing timeout
         if (gameState.actionTimeout) {
@@ -450,18 +452,54 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             // For other actions, require 3 clicks on the dino
             gameState.clicksNeeded = 3;
-            statusMessage.textContent = `${getActionMessage(action)} Tap the dino ${gameState.clicksNeeded} times!`;
             
             // Add click event listener for the dino
             dinoImage.addEventListener('click', handleDinoClick);
             // Also add touchstart for mobile devices
             dinoImage.addEventListener('touchstart', handleDinoClick);
+            
+            // Show hand animation after 3 seconds
+            setTimeout(() => {
+                if (gameState.currentAction === action && gameState.clicksNeeded > 0) {
+                    showHandAnimation();
+                }
+            }, 3000);
         }
+    }
+    
+    // Show hand animation to indicate clicking
+    function showHandAnimation() {
+        // Create hand element
+        const hand = document.createElement('div');
+        hand.className = 'hand-cursor';
+        
+        // Position in the center of the dino container
+        const dinoContainer = document.querySelector('.dino-container');
+        dinoContainer.appendChild(hand);
+        
+        // Position the hand in the center of the dino
+        hand.style.left = '50%';
+        hand.style.top = '50%';
+        
+        // Remove the hand after animation completes
+        setTimeout(() => {
+            if (hand && hand.parentNode) {
+                hand.parentNode.removeChild(hand);
+            }
+        }, 1500);
     }
     
     // Handle dino clicks/touches during actions
     function handleDinoClick(e) {
         if (!gameState.currentAction || gameState.currentAction === 'sleeping') return;
+        
+        // Add shake animation for feedback
+        dinoImage.classList.add('shake');
+        
+        // Remove shake animation after it completes
+        setTimeout(() => {
+            dinoImage.classList.remove('shake');
+        }, 300);
         
         gameState.clicksNeeded--;
         
@@ -471,8 +509,15 @@ document.addEventListener('DOMContentLoaded', () => {
             dinoImage.removeEventListener('touchstart', handleDinoClick);
             completeAction(getStatForAction(gameState.currentAction), getAmountForAction(gameState.currentAction));
         } else {
-            // Update status message with remaining clicks
-            statusMessage.textContent = `${getActionMessage(gameState.currentAction)} Tap the dino ${gameState.clicksNeeded} more times!`;
+            // Show remaining clicks with dots instead of text
+            statusMessage.textContent = '.'.repeat(gameState.clicksNeeded);
+            
+            // Show hand animation again if more clicks needed
+            setTimeout(() => {
+                if (gameState.currentAction && gameState.clicksNeeded > 0) {
+                    showHandAnimation();
+                }
+            }, 1500);
         }
     }
     
@@ -525,17 +570,6 @@ document.addEventListener('DOMContentLoaded', () => {
         gameState.lastIdleTime = Date.now();
         
         saveGame();
-    }
-    
-    // Get message for current action
-    function getActionMessage(action) {
-        switch(action) {
-            case 'eating': return 'Yum! Your dino is eating!';
-            case 'playing': return 'Your dino is having fun!';
-            case 'washing': return 'Scrub-a-dub! Your dino is getting clean!';
-            case 'sleeping': return 'Zzz... Your dino is sleeping!';
-            default: return '';
-        }
     }
     
     // Button event listeners
